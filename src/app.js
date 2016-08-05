@@ -1,23 +1,52 @@
-var ProfileBox = React.createClass({
-	render: function() {		
+//var profile_arr = [];
+var ProfileBox = React.createClass({	
+	getInitialState: function() {
+		return {profile: []};
+	},
+	componentDidMount: function(){		
+		$.ajax({
+			url: this.props.profile_url,
+			dataType: 'json',			
+			success: function(data) {
+				this.setState({profile: data});
+				//profile_arr = profile;
+				//console.log(this.state.profile.address.city);
+			}.bind(this),
+			error: function(xhr, status, err) {
+				console.error(this.props.profile_url, status, err.toString());
+			}.bind(this)
+		});
+
+		//profile_arr = this.state.profile;	
+	},
+	render: function() {
+		//console.log(typeof this.state.profile);
+		//console.log(typeof this.state.data.profile);				
 		return(
 			<div className="profileBox">
-				<Profile profile={this.props.profile} />
+				<Profile 
+					profile={this.state.profile} 					
+				/>
 			</div>
-		);
+		);		
 	}
 });
 
 var Profile = React.createClass({
-	render: function() {
-		var profileDetails = this.props.profile.map(function(profile){
-			return(
-				<PhotoDetails profile={profile} />
-			);				
-		});			
+	render: function() {	
+		console.log(this.props.profile);
+		/*
+		if (this.props.profile){
+			var profileDetails = this.props.profile.map(function(profile){
+				return(				
+					
+				);				
+			}); 
+		}	*/
+		//console.log(this.props.profile);
 		return(
-			<div className="profile">
-				{profileDetails}
+			<div className="profile">			
+				
 			</div>
 		);
 	}
@@ -60,22 +89,22 @@ var PhotoDetails = React.createClass({
 						<tr>
 							<td>address</td>
 							<td>street</td>
-							<td>{this.props.profile.address.street}</td>
+							<td>{this.props.address.street}</td>
 						</tr>
 						<tr>
 							<td></td>
 							<td>suite</td>
-							<td>{this.props.profile.address.suite}</td>
+							<td>{this.props.address.suite}</td>
 						</tr>
 						<tr>
 							<td></td>
 							<td>city</td>
-							<td>{this.props.profile.address.city}</td>
+							<td>{this.props.address.city}</td>
 						</tr>
 						<tr>
 							<td>geo</td>
 							<td>lat</td>
-							<td>{this.props.profile.address.geo.lat}</td>
+							<td>{this.props.address.geo.lat}</td>
 						</tr>
 						<tr>
 							<td></td>
@@ -155,6 +184,6 @@ var PHOTO = [
 ];
 
 ReactDOM.render(
-	<ProfileBox profile={PROFILE} photo={PHOTO}/>, 
+	<ProfileBox profile_url="http://jsonplaceholder.typicode.com/users/1" photo={PHOTO} />, 
 	document.getElementById('container')
 );

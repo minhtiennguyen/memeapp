@@ -1,4 +1,12 @@
+body {
+	max-width: 600px;
+	margin: 0 auto;
+}
+
 #container {
 	text-align: center;
 }
 
+.w3-col.s9.w3-container {
+	text-align: left;
+}

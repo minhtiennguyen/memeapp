@@ -1,7 +1,7 @@
 //let profile_arr = [];
 var ProfileBox = React.createClass({	
 	getInitialState: function() {
-		return {profile: undefined};
+		return {profile: undefined, photos: undefined};
 	},	
 	loadProfileFromServer: function() {
 		$.ajax({
@@ -17,22 +17,41 @@ var ProfileBox = React.createClass({
 	      }.bind(this)
 		});		
 	},
+	loadPhotosFromServer: function() {
+		$.ajax({
+			url: this.props.photos_url,
+			dataType: 'json',	
+			cache: false,		
+			success: function(data) {
+				this.setState({photos: data});	
+				//console.log(this.state.photos);			
+			}.bind(this),
+			error: function(xhr, status, err) {
+	        	console.error(this.props.profile_url, status, err.toString());
+	      }.bind(this)
+		});		
+	},
 	componentDidMount: function(){		
 		this.loadProfileFromServer();
+		this.loadPhotosFromServer();
 		//setInterval(this.loadProfileFromServer, this.props.pollInterval);
 	},
 	render: function() {
 		if (!this.state.profile) {         
-        	return <div>The response is not here yet!</div>
+        	return <div>Loading profile from server</div>
+     	}
+     	if (!this.state.photos) {         
+        	return <div>Loading photos from server</div>
      	}
      	/*
 		if (this.state.profile.length === 0) {         
         	return <div>No result found</div>
      	}*/	
-     	//console.log(this.state.profile.address.geo.lat);		
+     	//console.log(this.state.photos);		
      	return(
      		<div className="profileBox">
-				<Profile profile={this.state.profile} />
+				<Profile profile={this.state.profile} />	
+				<Photos photos={this.state.photos} />						
 			</div>
      	);	
 	}
@@ -43,7 +62,7 @@ var Profile = React.createClass({
 		return(
 			<div className="profile">				
 				<div className="w3-third">
-					img
+					<img src="text.png" />
 				</div>
 				<div className="w3-twothird">
 					<table className="w3-table">
@@ -120,60 +139,43 @@ var Profile = React.createClass({
 });
 
 var Photos = React.createClass({
+	render: function() {		
+		var photoNodes =  this.props.photos.map(function(photo) {
+			return (
+				<Photo albumId={photo.albumId} id={photo.id} title={photo.title} url={photo.url} thumbnailUrl={photo.thumbnailUrl} />			
+			);
+		}); 
+		return (
+			<div className="photos">
+				{photoNodes}
+			</div>
+		); 
+	}
+});
+
+var Photo = React.createClass({
 	render: function() {
 		return(
-			<p>Photos</p>
+			<div className="photo">
+				<div className="w3-row">
+					<div className="w3-col s3">
+						<a href={this.props.url}><img src={this.props.thumbnailUrl} /></a>
+					</div>
+					<div className="w3-col s9 w3-container">
+						<h3>ID: {this.props.id}</h3>
+						<p>Title: {this.props.title}</p>
+					</div>
+				</div>
+				<hr/>
+			</div>
 		);
 	}
 });
 
-var PROFILE = [
-	{
-		id: 1,
-		name: "Leanne Graham",
-		username: "Bret",
-		email: "Sincere@april.biz",
-		address: {
-			street: "Kulas Light",
-			suite: "Apt. 556",
-			city: "Gwenborough",
-			zipcode: "92998-3874",
-			geo: {
-			  lat: "-37.3159",
-			  lng: "81.1496"
-			}
-		},
-		phone: "1-770-736-8031 x56442",
-		website: "hildegard.org",
-		company: {
-			name: "Romaguera-Crona",
-			catchPhrase: "Multi-layered client-server neural-net",
-			bs: "harness real-time e-markets"
-		}
-	}
-];
-
-var PHOTO = [
-  { albumId : 1,
-    id: 1,
-    title: "accusamus beatae ad facilis cum similique qui sunt",
-    url: "http://placehold.it/600/92c952",
-    thumbnailUrl: "http://placehold.it/150/30ac17"
-  },
-  {
-    albumId: 1,
-    id: 2,
-    title: "reprehenderit est deserunt velit ipsam",
-    url: "http://placehold.it/600/771796",
-    thumbnailUrl: "http://placehold.it/150/dff9f6"
-  }
-];
-
 ReactDOM.render(
 	<ProfileBox 
 		profile_url="http://jsonplaceholder.typicode.com/users/1" 
-		
-		photo={PHOTO} 
+		photos_url="http://jsonplaceholder.typicode.com/photos" 		
 		pollInterval={2000}
 	/>, 
 	document.getElementById('container')

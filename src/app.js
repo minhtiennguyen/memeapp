@@ -1,61 +1,47 @@
-//var profile_arr = [];
+//let profile_arr = [];
 var ProfileBox = React.createClass({	
 	getInitialState: function() {
-		return {profile: []};
-	},
-	componentDidMount: function(){		
+		return {profile: undefined};
+	},	
+	loadProfileFromServer: function() {
 		$.ajax({
 			url: this.props.profile_url,
-			dataType: 'json',			
+			dataType: 'json',	
+			cache: false,		
 			success: function(data) {
-				this.setState({profile: data});
-				//profile_arr = profile;
-				//console.log(this.state.profile.address.city);
+				this.setState({profile: data});	
+				//console.log(this.state.profile);			
 			}.bind(this),
 			error: function(xhr, status, err) {
-				console.error(this.props.profile_url, status, err.toString());
-			}.bind(this)
-		});
-
-		//profile_arr = this.state.profile;	
+	        	console.error(this.props.profile_url, status, err.toString());
+	      }.bind(this)
+		});		
+	},
+	componentDidMount: function(){		
+		this.loadProfileFromServer();
+		//setInterval(this.loadProfileFromServer, this.props.pollInterval);
 	},
 	render: function() {
-		//console.log(typeof this.state.profile);
-		//console.log(typeof this.state.data.profile);				
-		return(
-			<div className="profileBox">
-				<Profile 
-					profile={this.state.profile} 					
-				/>
+		if (!this.state.profile) {         
+        	return <div>The response is not here yet!</div>
+     	}
+     	/*
+		if (this.state.profile.length === 0) {         
+        	return <div>No result found</div>
+     	}*/	
+     	//console.log(this.state.profile.address.geo.lat);		
+     	return(
+     		<div className="profileBox">
+				<Profile profile={this.state.profile} />
 			</div>
-		);		
+     	);	
 	}
 });
 
 var Profile = React.createClass({
 	render: function() {	
-		console.log(this.props.profile);
-		/*
-		if (this.props.profile){
-			var profileDetails = this.props.profile.map(function(profile){
-				return(				
-					
-				);				
-			}); 
-		}	*/
-		//console.log(this.props.profile);
 		return(
-			<div className="profile">			
-				
-			</div>
-		);
-	}
-});
-
-var PhotoDetails = React.createClass({
-	render: function() {
-		return(
-			<div className="profileDetails">
+			<div className="profile">				
 				<div className="w3-third">
 					img
 				</div>
@@ -89,22 +75,22 @@ var PhotoDetails = React.createClass({
 						<tr>
 							<td>address</td>
 							<td>street</td>
-							<td>{this.props.address.street}</td>
+							<td>{this.props.profile.address.street}</td>
 						</tr>
 						<tr>
 							<td></td>
 							<td>suite</td>
-							<td>{this.props.address.suite}</td>
+							<td>{this.props.profile.address.suite}</td>
 						</tr>
 						<tr>
 							<td></td>
 							<td>city</td>
-							<td>{this.props.address.city}</td>
+							<td>{this.props.profile.address.city}</td>
 						</tr>
 						<tr>
 							<td>geo</td>
 							<td>lat</td>
-							<td>{this.props.address.geo.lat}</td>
+							<td>{this.props.profile.address.geo.lat}</td>
 						</tr>
 						<tr>
 							<td></td>
@@ -184,6 +170,11 @@ var PHOTO = [
 ];
 
 ReactDOM.render(
-	<ProfileBox profile_url="http://jsonplaceholder.typicode.com/users/1" photo={PHOTO} />, 
+	<ProfileBox 
+		profile_url="http://jsonplaceholder.typicode.com/users/1" 
+		
+		photo={PHOTO} 
+		pollInterval={2000}
+	/>, 
 	document.getElementById('container')
 );

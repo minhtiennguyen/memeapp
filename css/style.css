@@ -7,6 +7,8 @@ body {
 	text-align: center;
 }
 
-.w3-col.s9.w3-container {
+.w3-col.s9.w3-container,
+.comment {
 	text-align: left;
 }
+

@@ -53,7 +53,7 @@ var Profile = React.createClass({
 				<div className="w3-twothird">
 					<table className="w3-table">
 						<tr>
-							<td>bio</td>
+							<td><em>bio</em></td>
 							<td>name</td>
 							<td>{this.state.profile.name}</td>
 						</tr>
@@ -78,7 +78,7 @@ var Profile = React.createClass({
 							<td>{this.state.profile.website}</td>
 						</tr>
 						<tr>
-							<td>address</td>
+							<td><em>address</em></td>
 							<td>street</td>
 							<td>{this.state.profile.address.street}</td>
 						</tr>
@@ -93,7 +93,7 @@ var Profile = React.createClass({
 							<td>{this.state.profile.address.city}</td>
 						</tr>
 						<tr>
-							<td>geo</td>
+							<td><em>geo</em></td>
 							<td>lat</td>
 							<td>{this.state.profile.address.geo.lat}</td>
 						</tr>
@@ -103,7 +103,7 @@ var Profile = React.createClass({
 							<td>{this.state.profile.address.geo.lng}</td>
 						</tr>
 						<tr>
-							<td>company</td>
+							<td><em>company</em></td>
 							<td>name</td>
 							<td>{this.state.profile.company.name}</td>
 						</tr>
@@ -169,10 +169,9 @@ var Photo = React.createClass({
 			<div className="photo">
 				<div className="w3-row">
 					<div className="w3-col s3">
-						<a href={this.props.url}><img src={this.props.thumbnailUrl} /></a>
+						<Link to={'/comment/'+this.props.id}><img src={this.props.thumbnailUrl} /></Link>
 					</div>
-					<div className="w3-col s9 w3-container">
-						<Link to={'/comment/'+this.props.id }>comment</Link>
+					<div className="w3-col s9 w3-container">											
 						<h3>ID: {this.props.id}</h3>
 						<p>Title: {this.props.title}</p>
 					</div>
@@ -184,9 +183,59 @@ var Photo = React.createClass({
 });
 
 var Comment = React.createClass({
+	getInitialState: function() {
+		return {comment: undefined, img: undefined};
+	},
+	loadCommentFromServer: function() {
+		$.ajax({
+			url: 'http://jsonplaceholder.typicode.com/comments?id='+this.props.params.id,
+			dataType: 'json',	
+			cache: false,		
+			success: function(data) {
+				this.setState({comment: data});	
+				//console.log(this.state.comment);			
+			}.bind(this),
+			error: function(xhr, status, err) {
+	        	console.error(profile_url, status, err.toString());
+	      }.bind(this)
+		});		
+	},
+	getImg: function() {
+		$.ajax({
+			url: 'http://jsonplaceholder.typicode.com/photos/'+this.props.params.id,
+			dataType: 'json',	
+			cache: false,		
+			success: function(data) {
+				this.setState({img: data});	
+				//console.log(this.state.img);			
+			}.bind(this),
+			error: function(xhr, status, err) {
+	        	console.error(profile_url, status, err.toString());
+	      }.bind(this)
+		});	
+	},
+	componentDidMount: function() {
+		this.loadCommentFromServer();
+		this.getImg();
+	},
 	render: function() {
+		if (!this.state.comment) {         
+        	return <div>Loading comment...</div>
+     	}
+     	if (!this.state.comment) {         
+        	return <div>Loading image...</div>
+     	}
 		return(
-			<h3>ID {this.props.params.id}</h3>
+			<div className="comment">
+				<div className="w3-row">
+					<p><strong>Photo Id:</strong> {this.props.params.id}</p>
+					<p><strong>Name:</strong> {this.state.comment[0].name}</p>
+					<p><strong>Email:</strong> {this.state.comment[0].email}</p>
+					<p><strong>Body:</strong> {this.state.comment[0].body}</p>	
+					<hr/>
+					<img src={this.state.img.url} />				
+				</div>
+			</div>				
 		);
 	}
 });

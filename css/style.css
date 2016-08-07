@@ -12,3 +12,16 @@ body {
 	text-align: left;
 }
 
+#container > div > ul > li {
+	width: 50% !important;
+	float: left;
+}
+
+.nav {
+	margin-bottom: 20px;
+	margin-top: 5px;
+}
+
+.photos {
+	text-align: left;
+}

@@ -6,13 +6,25 @@ var { Router,
 
 var App = React.createClass({
 	render: function() {
+		//console.log(this.props.location);
+		var path_name = this.props.location.pathname;
+		if(path_name.indexOf("comment") !== -1) {
+			return(
+				<div>			
+					<ul className="nav w3-navbar w3-border">					
+						<li className="w3-green"><Link to="/photos">Back</Link></li>
+					</ul>			
+				{this.props.children}			
+				</div>
+		);
+		}
 		return(
 			<div>			
-				<ul>
-					<li><Link to="/profile">Profile</Link></li>
-					<li><Link to="/photos">Photos</Link></li>
+				<ul className="nav w3-navbar w3-border">
+					<li className={(path_name.indexOf("profile") !== -1) ? "w3-green" : null }><Link to="/profile">Profile</Link></li>
+					<li className={(path_name.indexOf("photos") !== -1) ? "w3-green" : null }><Link to="/photos">Photos</Link></li>
 				</ul>			
-			{this.props.children}
+			{this.props.children}			
 			</div>
 		);
 	}
@@ -167,13 +179,13 @@ var Photo = React.createClass({
 	render: function() {
 		return(
 			<div className="photo">
-				<div className="w3-row">
-					<div className="w3-col s3">
+				<div className="w3-row-padding">
+					<div className="w3-col m4 l4 s4">
 						<Link to={'/comment/'+this.props.id}><img src={this.props.thumbnailUrl} /></Link>
 					</div>
-					<div className="w3-col s9 w3-container">											
-						<h3>ID: {this.props.id}</h3>
-						<p>Title: {this.props.title}</p>
+					<div className="w3-col m8 l8 s8 w3-container">											
+						<p><strong>ID:</strong> {this.props.id}</p>
+						<p><strong>Title:</strong> {this.props.title}</p>
 					</div>
 				</div>
 				<hr/>
@@ -243,6 +255,7 @@ var Comment = React.createClass({
 ReactDOM.render(
 	<Router>
 		<Route path="/" component={App}>
+			<IndexRoute component={Profile} />
 			<Route path="/profile" component={Profile} />
 			<Route path="/photos" component={Photos} />
 			<Route path="/comment/:id" component={Comment} />
@@ -250,3 +263,4 @@ ReactDOM.render(
 	</Router>,
 	document.getElementById('container')
 );
+
